@@ -7,12 +7,12 @@ TMDB-backed add/select workflow for managing the movie list.
 
 from flask import Flask, render_template, redirect, url_for, request
 from flask_bootstrap import Bootstrap5
-from database import db, seed_movies, recalculate_rankings, Movies
+from src.database import db, seed_movies, recalculate_rankings, Movies
 import os
 from dotenv import load_dotenv
 
-from rate_movie import RateMovieForm, AddMovieForm
-from movie_db_api import GetMovie
+from src.rate_movie import RateMovieForm, AddMovieForm
+from src.select_movie_service import process_movie_selection
 
 # Get movie stuff
 load_dotenv()
@@ -34,11 +34,6 @@ with app.app_context():
 
 @app.route("/")
 def home():
-    if request.method == "GET":
-        movie_id = request.args.get("id", type=int)
-        url = f'https://api.themoviedb.org/3/movie/{movie_id}'
-        movie = GetMovie(url=url, token=API_token,query=None)
-
     all_movies = db.session.execute(db.select(Movies).order_by(Movies.ranking)).scalars().all()
     return render_template("index.html", movies=all_movies)
 
@@ -89,46 +84,23 @@ def select_movie():
     if not query:
         return redirect(url_for("add_movie"))
 
-    movie_query = GetMovie(query=query, token=API_token, url=url)
-    data = movie_query.get_movie()
-    results = data.get("results", [])
+    result = process_movie_selection(
+        query=query,
+        selected_id=selected_id,
+        api_token=API_token,
+        search_url=url,
+    )
 
-    if selected_id:
-        selected_movie = next((movie for movie in results if movie.get("id") == selected_id), None)
-        if selected_movie is None:
-            return redirect(url_for("select_movie", query=query))
+    if result["status"] == "not_found":
+        return redirect(url_for("select_movie", query=query))
 
-        title = selected_movie.get("title") or selected_movie.get("original_title") or "Untitled"
-        existing_movie = db.session.execute(
-            db.select(Movies).where(Movies.title == title)
-        ).scalar_one_or_none()
-        if existing_movie:
-            return redirect(url_for("home"))
+    if result["status"] == "duplicate":
+        return redirect(url_for("home"))
 
-        existing_movies = db.session.execute(db.select(Movies)).scalars().all()
-        for movie in existing_movies:
-            movie.ranking += 1
+    if result["status"] == "added":
+        return redirect(url_for("edit", id=result["movie"].id))
 
-        release_date = selected_movie.get("release_date") or ""
-        year = int(release_date[:4]) if release_date[:4].isdigit() else 0
-        poster_path = selected_movie.get("poster_path")
-        img_url = f"https://image.tmdb.org/t/p/w500{poster_path}" if poster_path else ""
-        rating = round(float(selected_movie.get("vote_average") or 0), 1)
-
-        new_movie = Movies(
-            title=title,
-            year=year,
-            description=selected_movie.get("overview") or "No overview available.",
-            rating=rating,
-            ranking=1,
-            review="",
-            img_url=img_url,
-        )
-        db.session.add(new_movie)
-        db.session.commit()
-        return redirect(url_for("edit", id=new_movie.id))
-
-    return render_template("select.html", movies=results, query=query)
+    return render_template("select.html", movies=result["results"], query=query)
 
 if __name__ == '__main__':
     app.run(debug=True)
