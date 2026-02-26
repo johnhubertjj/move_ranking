@@ -1,7 +1,21 @@
+"""
+TMDB API client helpers.
+
+This module contains a small wrapper class used to query The Movie Database
+API for movie search results and movie details.
+"""
+
 import requests
 
 
 class GetMovie:
+    """Client wrapper for TMDB movie endpoints.
+
+    :param query: Search text for movie lookup. May be ``None`` for detail calls.
+    :param token: TMDB API bearer token.
+    :param url: TMDB endpoint URL to request.
+    """
+
     def __init__(self, query, token, url):
         self.query = query
         self.API_token = token

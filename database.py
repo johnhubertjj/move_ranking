@@ -1,8 +1,17 @@
+"""
+Database models and persistence helpers for the movie app.
+
+This module defines the SQLAlchemy instance, ORM models, and helper
+functions used to seed data and maintain ranking order.
+"""
+
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import DeclarativeBase
 
 
 class Base(DeclarativeBase):
+    """Base declarative class for SQLAlchemy ORM models."""
+
     pass
 
 
@@ -10,6 +19,8 @@ db = SQLAlchemy(model_class=Base)
 
 
 class Movies(db.Model):
+    """ORM model representing a movie entry displayed in the app."""
+
     __tablename__ = "Movie"
 
     id = db.Column(db.Integer, primary_key=True)

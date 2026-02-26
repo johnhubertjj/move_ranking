@@ -1,3 +1,10 @@
+"""
+Flask application entry point for the Top Movies project.
+
+This module configures the Flask app, routes, database integration, and
+TMDB-backed add/select workflow for managing the movie list.
+"""
+
 from flask import Flask, render_template, redirect, url_for, request
 from flask_bootstrap import Bootstrap5
 from database import db, seed_movies, recalculate_rankings, Movies
