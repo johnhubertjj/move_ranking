@@ -9,7 +9,7 @@ from wtforms import StringField, SubmitField
 from wtforms.validators import DataRequired, Regexp
 
 
-def rating_structure():
+def rating_structure() -> Regexp:
     return Regexp(
         r"^(10(?:\.0)?|[0-9](?:\.[0-9])?)$",
         message="Rating must be a whole number or one decimal place between 0 and 10.",

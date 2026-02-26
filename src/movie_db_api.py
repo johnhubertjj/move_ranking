@@ -5,6 +5,8 @@ This module contains a small wrapper class used to query The Movie Database
 API for movie search results and movie details.
 """
 
+from typing import Any
+
 import requests
 
 
@@ -16,12 +18,12 @@ class GetMovie:
     :param url: TMDB endpoint URL to request.
     """
 
-    def __init__(self, query, token, url):
+    def __init__(self, query: str | None, token: str, url: str) -> None:
         self.query = query
         self.API_token = token
         self.url = url
 
-    def get_movie(self):
+    def get_movie(self) -> dict[str, Any]:
         if self.query:
             params = {
                 'query': self.query,

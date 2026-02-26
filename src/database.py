@@ -33,7 +33,7 @@ class Movies(db.Model):
     img_url = db.Column(db.String, nullable=False)
 
 
-def seed_movies():
+def seed_movies() -> None:
     db.create_all()
 
     samples = [
@@ -65,7 +65,7 @@ def seed_movies():
     db.session.commit()
 
 
-def recalculate_rankings():
+def recalculate_rankings() -> None:
     movies = db.session.execute(
         db.select(Movies).order_by(Movies.rating.desc(), Movies.id.asc())
     ).scalars().all()

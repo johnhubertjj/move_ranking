@@ -5,25 +5,23 @@ This module encapsulates the non-route logic used by the ``/select`` Flask
 endpoint to fetch TMDB search results and add a selected movie to the local
 application database.
 """
+from __future__ import annotations
+
+from typing import Any
 
 from src.database import db, Movies
 from src.movie_db_api import GetMovie
 
 
-def process_movie_selection(query, selected_id, api_token, search_url):
+def process_movie_selection(query: str, selected_id: int | None, api_token: str, search_url: str) -> dict[str, Any]:
     """Fetch search results and optionally add a selected movie to the database.
 
     :param query: User-entered movie title search text.
-    :type query: str
     :param selected_id: TMDB movie identifier selected by the user.
-    :type selected_id: int | None
     :param api_token: TMDB API bearer token.
-    :type api_token: str
     :param search_url: TMDB search endpoint URL.
-    :type search_url: str
     :returns: A result dictionary with keys ``status``, ``results``, and
         optionally ``movie`` when a movie is added.
-    :rtype: dict
     """
     movie_query = GetMovie(query=query, token=api_token, url=search_url)
     data = movie_query.get_movie()
