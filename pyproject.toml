@@ -6,6 +6,7 @@ readme = "README.md"
 requires-python = ">=3.9"
 dependencies = [
     "bootstrap-flask==2.2.0",
+    "dotenv>=0.9.9",
     "flask==2.3.2",
     "flask-sqlalchemy==3.1.1",
     "flask-wtf==1.2.1",

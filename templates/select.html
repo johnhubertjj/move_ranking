@@ -5,9 +5,18 @@
 {% block content %}
 <div class="container">
     <h1 class="heading">Select Movie</h1>
-  <p>
-    <a href="#"> MOVIE TITLE - MOVIE RELEASE DATE</a>
-  </p>
+   <div class="container">
+  <ul>
+
+    {% for movie in movies %}
+      <li>
+        <a href="{{ url_for('select_movie', query=query, id=movie.id) }}">
+          {{ movie.title }} {{ movie.release_date or "TBA" }}
+        </a>
+      </li>
+    {% endfor %}
+  </ul>
+</div>
 
 </div>
 {% endblock %}

@@ -52,3 +52,12 @@ def seed_movies():
             db.session.add(Movies(**sample))
 
     db.session.commit()
+
+
+def recalculate_rankings():
+    movies = db.session.execute(
+        db.select(Movies).order_by(Movies.rating.desc(), Movies.id.asc())
+    ).scalars().all()
+
+    for rank, movie in enumerate(movies, start=1):
+        movie.ranking = rank
